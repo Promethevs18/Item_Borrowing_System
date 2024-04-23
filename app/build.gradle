@@ -1,8 +1,23 @@
 plugins {
     alias(libs.plugins.androidApplication)
+    id 'com.google.gms.google-services'
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('A:\\Documents\\All_Programming_Files\\Android Keys\\Testing.jks')
+            storePassword 'phony112'
+            keyAlias 'Debugging'
+            keyPassword 'phony112'
+        }
+        release {
+            storeFile file('A:\\Documents\\All_Programming_Files\\Android Keys\\Deployment.jks')
+            storePassword 'phony112'
+            keyAlias 'vonnie'
+            keyPassword 'phony112'
+        }
+    }
     namespace 'com.item.borrowing'
     compileSdk 34
 
@@ -14,18 +29,33 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            applicationIdSuffix '.forClient'
+            versionNameSuffix '-deploy'
+            multiDexEnabled true
+            signingConfig signingConfigs.release
+
+        }
+        debug {
+            applicationIdSuffix '.forTesting'
+            versionNameSuffix '-test'
+            jniDebuggable true
+            renderscriptDebuggable true
+            signingConfig signingConfigs.debug
+            multiDexEnabled true
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildToolsVersion '35.0.0 rc1'
 }
 
 dependencies {
@@ -34,7 +64,15 @@ dependencies {
     implementation libs.material
     implementation libs.activity
     implementation libs.constraintlayout
+
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+
+    // Import the BoM for the Firebase platform
+    implementation(platform(libs.firebase.bom))
+
+//    External implementations
+    implementation libs.firebase.firestore
+    implementation libs.firebase.auth
 }
