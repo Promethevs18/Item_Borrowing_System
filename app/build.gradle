@@ -58,6 +58,9 @@ android {
     buildToolsVersion '35.0.0 rc1'
 }
 
+//for the Google Sign-in integration
+apply plugin: 'com.android.application'
+
 dependencies {
 
     implementation libs.appcompat
@@ -73,6 +76,13 @@ dependencies {
     implementation(platform(libs.firebase.bom))
 
 //    External implementations
+        //Firebase related
     implementation libs.firebase.firestore
     implementation libs.firebase.auth
+
+//       Google Sign-In related
+    implementation libs.credentials
+    implementation libs.credentials.play.services.auth
+    implementation libs.googleid
+    implementation libs.play.services.auth
 }

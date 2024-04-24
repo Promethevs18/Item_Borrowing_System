@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+                <!-- Default colors          -->
+    <color name="initialColorWhenLight">#FF000000</color>
+    <color name="initialColorWhenDark">#FFFFFFFF</color>
+
+                <!-- Color background   -->
+    <color name="backgroundWhenLight">#B8C3C1</color>
+    <color name="backgroundWhenDark">#222222</color>
+
+                <!-- For the ca   -->
 </resources>
