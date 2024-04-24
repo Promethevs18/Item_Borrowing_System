@@ -1,9 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.ItemBorrowingSystem" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.ItemBorrowingSystem" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Customize your dark theme here. -->
          <item name="android:windowBackground">@color/backgroundWhenDark</item>
-         <item name="android:textColor">@color/initialColorWhenDark</item>
+         <item name="android:textColor">@color/initialColorWhenLight</item>
 
+        <item name="colorPrimary">@color/generalWhenDark</item>
     </style>
 </resources>

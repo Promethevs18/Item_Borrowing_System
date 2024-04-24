@@ -1,10 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.ItemBorrowingSystem" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.ItemBorrowingSystem" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="android:windowBackground">@color/backgroundWhenLight</item>
-        <item name="android:textColor">@color/initialColorWhenLight</item>
+        <item name="android:textColor">@color/initialColorWhenDark</item>
+
+        <item name="colorPrimary">@color/generalWhenLight</item>
     </style>
 
     <style name="Theme.ItemBorrowingSystem" parent="Base.Theme.ItemBorrowingSystem" />

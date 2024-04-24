@@ -8,5 +8,9 @@
     <color name="backgroundWhenLight">#B8C3C1</color>
     <color name="backgroundWhenDark">#222222</color>
 
-                <!-- For the ca   -->
+                <!-- For the general colors  -->
+    <color  name="generalWhenLight">#970000</color>
+    <color  name="generalWhenDark">#D8D438</color>
+
+
 </resources>

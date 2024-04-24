@@ -7,13 +7,51 @@
     android:layout_height="match_parent"
     tools:context=".SignInInterface">
 
-    <Button
-        android:id="@+id/google_sign"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sign in using Google"
+    <androidx.cardview.widget.CardView
+        android:layout_width="300dp"
+        android:layout_height="350dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/google_sign"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/google_logo"
+                android:text="Continue with Google"
+                android:textColor="?android:attr/textColor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/rightGuide"
+                app:layout_constraintStart_toStartOf="@+id/leftGuide"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/leftGuide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.10666667" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/rightGuide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="32dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
