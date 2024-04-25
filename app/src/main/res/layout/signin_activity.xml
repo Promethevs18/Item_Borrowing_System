@@ -25,19 +25,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <Button
-                android:id="@+id/google_sign"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:drawableEnd="@drawable/google_logo"
-                android:text="Continue with Google"
-                android:textColor="?attr/CustomTextColor"
-                app:layout_constraintEnd_toStartOf="@+id/rightGuide"
-                app:layout_constraintStart_toStartOf="@+id/leftGuide"
-                app:layout_constraintTop_toBottomOf="@+id/textView"
-                tools:ignore="HardcodedText" />
-
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/leftGuide"
                 android:layout_width="wrap_content"
@@ -103,7 +90,35 @@
                 android:text="or"
                 app:layout_constraintEnd_toStartOf="@+id/rightGuide"
                 app:layout_constraintStart_toStartOf="@+id/leftGuide"
+                app:layout_constraintTop_toBottomOf="@+id/login" />
+
+            <Button
+                android:id="@+id/login"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Log in"
+                app:layout_constraintEnd_toStartOf="@+id/rightGuide"
+                app:layout_constraintStart_toStartOf="@+id/leftGuide"
                 app:layout_constraintTop_toBottomOf="@+id/textLayout_pass" />
+
+            <Button
+                android:id="@+id/google_sign"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:drawableEnd="@drawable/google_logo"
+                android:text="Continue With Google"
+                android:textColor="?android:textColor"
+                app:cornerRadius="20dp"
+                app:layout_constraintEnd_toStartOf="@+id/rightGuide"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/leftGuide"
+                app:layout_constraintTop_toBottomOf="@+id/textView"
+                app:rippleColor="?attr/colorPrimary"
+                app:strokeColor="#090909"
+                app:strokeWidth="1dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

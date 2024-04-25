@@ -1,10 +1,12 @@
 package com.item.borrowing;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -22,9 +24,13 @@ import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.PublicKeyCredential;
 import androidx.credentials.exceptions.GetCredentialException;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -32,6 +38,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.item.borrowing.admin.Admin_UI;
+import com.item.borrowing.client.Client_UI;
+import com.item.borrowing.tools.LoadingDialog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,9 +49,12 @@ import java.util.concurrent.Executor;
 
 public class SignInInterface extends AppCompatActivity {
 
-    Button button;
+    Button button, login;
     FirebaseAuth userAuth;
     FirebaseUser currentUser;
+    TextInputLayout forEmail, forPass;
+    TextInputEditText email, pass;
+    LoadingDialog load;
 
     FirebaseFirestore apoy = FirebaseFirestore.getInstance();
     @Override
@@ -60,13 +72,27 @@ public class SignInInterface extends AppCompatActivity {
 
         //Write code here =>
         button = findViewById(R.id.google_sign);
+        login = findViewById(R.id.login);
+
         userAuth = FirebaseAuth.getInstance();
 
+        forEmail = findViewById(R.id.textLayout_user);
+        forPass = findViewById(R.id.textLayout_pass);
+
+        email = findViewById(R.id.textInput_user);
+        pass = findViewById(R.id.textInput_pass);
+
+        //getting the current user from Firebase
+        currentUser = userAuth.getCurrentUser();
+
+        if(currentUser != null){
+            Intent goAdmin = new Intent(SignInInterface.this, Admin_UI.class);
+            startActivity(goAdmin);
+        }
     }
     @Override
     protected void onStart() {
         super.onStart();
-
         //First, let's call the necessary variables
         CancellationSignal cancellationSignal = new CancellationSignal();
         Executor executor = AsyncTask.THREAD_POOL_EXECUTOR;
@@ -86,15 +112,11 @@ public class SignInInterface extends AppCompatActivity {
                 .addCredentialOption(idOption)
                         .build();
 
-        currentUser = userAuth.getCurrentUser();
-
 
         //When the Continue with Google button is pressed
         button.setOnClickListener(v -> {
-            if(currentUser != null){
-                Toast.makeText(this, "User is currently signed in", Toast.LENGTH_SHORT).show();
-            }
-            else{
+            load = new LoadingDialog(SignInInterface.this, "Verifying credentials");
+            load.Show();
                 credentialManager.getCredentialAsync(
                         SignInInterface.this, credRequest, cancellationSignal, executor, new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
                             @Override
@@ -113,8 +135,33 @@ public class SignInInterface extends AppCompatActivity {
                             }
                         }
                 );
+        });
+
+        login.setOnClickListener(v -> {
+            load = new LoadingDialog(SignInInterface.this, "Verifying credentials");
+            load.Show();
+            if(email.getText().toString().isEmpty() || pass.getText().toString().isEmpty()){
+                forEmail.setError("Fields are required");
+                forPass.setError("Fields are required");
+            }
+            else{
+                userAuth.signInWithEmailAndPassword(email.getText().toString(), pass.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Intent goAdmin = new Intent(SignInInterface.this, Admin_UI.class);
+                            startActivity(goAdmin);
+                        }
+                        else{
+                            forEmail.setError("Credentials do not match");
+                            forPass.setError("Credentials do not match");
+                        }
+                    }
+                });
             }
         });
+
+
     }
 
     //The method that handles the GoogleSignIn using the new Credential Manager
@@ -133,7 +180,7 @@ public class SignInInterface extends AppCompatActivity {
             if(GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(creds.getType())){
                 try{
                     //If nag-match, kunin natin ang buong data from the GoogleIdTokenCredential
-                    GoogleIdTokenCredential googol = GoogleIdTokenCredential.createFrom(((CustomCredential) creds).getData());
+                    GoogleIdTokenCredential googol = GoogleIdTokenCredential.createFrom((creds).getData());
 
                     //Now, we are going to use the token to sign in to our Firebase Authentication
                     SignInToFirebase(googol);
@@ -177,7 +224,9 @@ public class SignInInterface extends AppCompatActivity {
             userAuth.signInWithCredential(fireCreds).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                 @Override
                 public void onSuccess(AuthResult authResult) {
-                    Toast.makeText(SignInInterface.this, authResult.getUser().getDisplayName(), Toast.LENGTH_SHORT).show();
+                    load.Close();
+                    Intent goUser = new Intent(SignInInterface.this, Client_UI.class);
+                    startActivity(goUser);
                 }
             });
         }
@@ -185,4 +234,5 @@ public class SignInInterface extends AppCompatActivity {
             Toast.makeText(this, "Something went wrong with requesting the Sign in to Firebase", Toast.LENGTH_SHORT).show();
         }
     }
+
 }

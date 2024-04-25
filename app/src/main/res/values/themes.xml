@@ -8,11 +8,6 @@
 
         <item name="colorPrimary">@color/generalWhenLight</item>
 
-        <!--  Custom Border      -->
-        <item name="CustomBorderColor">@color/initialColorWhenLight</item>
-
-        <!--  Custom TextColor      -->
-        <item name="CustomTextColor">@color/initialColorWhenDark</item>
     </style>
 
     <style name="Theme.ItemBorrowingSystem" parent="Base.Theme.ItemBorrowingSystem" />

@@ -7,11 +7,6 @@
 
         <item name="colorPrimary">@color/generalWhenDark</item>
 
-        <!--  Custom Border      -->
-        <item name="CustomBorderColor">@color/initialColorWhenDark</item>
-
-        <!--  Custom TextColor      -->
-        <item name="CustomTextColor">@color/initialColorWhenLight</item>
     </style>
 
 
