@@ -40,6 +40,7 @@ android {
             versionNameSuffix '-deploy'
             multiDexEnabled true
             signingConfig signingConfigs.release
+            resValue "string", "web_client_id", (project.findProperty("WEB_CLIENT_ID")?: "")
 
         }
         debug {
@@ -49,6 +50,7 @@ android {
             renderscriptDebuggable true
             signingConfig signingConfigs.debug
             multiDexEnabled true
+            resValue "string", "web_client_id", (project.findProperty("WEB_CLIENT_ID")?: "")
         }
     }
     compileOptions {

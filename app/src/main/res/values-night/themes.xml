@@ -3,8 +3,16 @@
     <style name="Base.Theme.ItemBorrowingSystem" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Customize your dark theme here. -->
          <item name="android:windowBackground">@color/backgroundWhenDark</item>
-         <item name="android:textColor">@color/initialColorWhenLight</item>
+         <item name="android:textColor">@color/initialColorWhenDark</item>
 
         <item name="colorPrimary">@color/generalWhenDark</item>
+
+        <!--  Custom Border      -->
+        <item name="CustomBorderColor">@color/initialColorWhenDark</item>
+
+        <!--  Custom TextColor      -->
+        <item name="CustomTextColor">@color/initialColorWhenLight</item>
     </style>
+
+
 </resources>
