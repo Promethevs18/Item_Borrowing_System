@@ -12,4 +12,5 @@
     <color  name="generalWhenLight">#970000</color>
     <color  name="generalWhenDark">#D8D438</color>
 
+    <color name="tintWhenDark">#a46517</color>
 </resources>
