@@ -13,6 +13,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.item.borrowing.R;
 import com.item.borrowing.client.Models.itemsModels;
+import com.squareup.picasso.Picasso;
 
 public class itemsAdapter extends FirestoreRecyclerAdapter<itemsModels, itemsAdapter.myViewHolder> {
     public itemsAdapter(@NonNull FirestoreRecyclerOptions<itemsModels> options) {
@@ -49,7 +50,7 @@ public class itemsAdapter extends FirestoreRecyclerAdapter<itemsModels, itemsAda
             genDesc.setText(itemsModels.getGenSpecs());
             brandModel.setText(itemsModels.getBrandModel());
 
-
+            Picasso.get().load(itemsModels.getItemImage()).into(itemImage);
         }
     }
 }

@@ -13,4 +13,6 @@
     <color  name="generalWhenDark">#D8D438</color>
 
     <color name="tintWhenDark">#a46517</color>
+
+    <color name="primaryBackgroundColor">#8c2e40</color>
 </resources>

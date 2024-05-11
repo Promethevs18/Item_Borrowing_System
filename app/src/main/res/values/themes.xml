@@ -8,6 +8,8 @@
 
         <item name="colorPrimary">@color/generalWhenLight</item>
 
+        <item name="PrimaryBackground">@color/tintWhenDark</item>
+
     </style>
 
     <style name="Theme.ItemBorrowingSystem" parent="Base.Theme.ItemBorrowingSystem" />
