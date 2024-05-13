@@ -1,8 +1,7 @@
-package com.item.borrowing.client;
+package com.item.borrowing.client.UI;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -14,7 +13,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,6 +22,7 @@ import com.item.borrowing.R;
 import com.item.borrowing.SignInInterface;
 import com.item.borrowing.client.Adapters.itemsAdapter;
 import com.item.borrowing.client.Models.itemsModels;
+import com.item.borrowing.tools.LoadingDialog;
 import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
@@ -39,7 +38,10 @@ public class Client_UI extends AppCompatActivity {
     TextView intro;
     CircleImageView Krizzia;
     Button GoBorrow;
+    itemsAdapter adapter;
+    FirebaseUser user;
 
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +64,10 @@ public class Client_UI extends AppCompatActivity {
         //query
         query = apoy.collection("Items");
 
+        //firebase auth
+        auth = FirebaseAuth.getInstance();
+        //firebase user
+        user = auth.getCurrentUser();
 
         //Creating a layoutManager
         RecyclerView.LayoutManager manager = new LinearLayoutManager(Client_UI.this, RecyclerView.VERTICAL, false);
@@ -74,22 +80,23 @@ public class Client_UI extends AppCompatActivity {
 
 
         //call the adapter, then set the RecyclerOptions to the adapter
-        itemsAdapter adapter = new itemsAdapter(options);
+        adapter = new itemsAdapter(options);
         listahan.setAdapter(adapter);
 
         //Don't forget to use start Listening
         adapter.startListening();
 
-        auth = FirebaseAuth.getInstance();
+
+        //for the display of both names and pic
+        intro.setText(String.format("Welcome, \n%s!", Objects.requireNonNull(user).getDisplayName()));
+        Picasso.get().load(user.getPhotoUrl()).into(Krizzia);
+
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        FirebaseUser user = auth.getCurrentUser();
-        intro.setText(String.format("Welcome, \n%s!", Objects.requireNonNull(user).getDisplayName()));
-        Picasso.get().load(user.getPhotoUrl()).into(Krizzia);
 
         GoBorrow.setOnClickListener(v -> {
             Intent goBorrow = new Intent(Client_UI.this, BorrowUI.class);
@@ -97,10 +104,46 @@ public class Client_UI extends AppCompatActivity {
         });
 
         Krizzia.setOnClickListener(v -> {
-            auth.signOut();
-            Intent goSignOut = new Intent(Client_UI.this, SignInInterface.class);
-            startActivity(goSignOut);
-            finish();
+            Intent goCustom = new Intent(Client_UI.this, User_Account_Customization.class);
+            startActivity(goCustom);
         });
+
+        //for loading logic
+        LoadingDialog load = new LoadingDialog(Client_UI.this, "Fetching data from the database");
+        load.Show();
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                load.Close();
+            }
+
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                load.Close();
+            }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                super.onItemRangeRemoved(positionStart, itemCount);
+                load.Close();
+            }
+        });
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        auth.signOut();
+        adapter.stopListening();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        auth.signOut();
+        adapter.stopListening();
     }
 }

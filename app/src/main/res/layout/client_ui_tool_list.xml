@@ -9,6 +9,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        app:cardBackgroundColor="?attr/PrimaryBackground"
         app:cardCornerRadius="20dp"
         app:cardElevation="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -37,6 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="Insert Item Name Here"
+                android:textColor="#FFF"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@+id/itemImage"
@@ -48,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="TextView"
+                android:textColor="#FFF"
                 android:textSize="16sp"
                 android:textStyle="italic"
                 app:layout_constraintStart_toStartOf="@+id/assetName"
@@ -57,9 +60,11 @@
                 android:id="@+id/genDesc"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:text="TextView"
+                android:textColor="#FFF"
                 app:layout_constraintEnd_toStartOf="@+id/guideline"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="@+id/brandModel"
                 app:layout_constraintTop_toBottomOf="@+id/brandModel" />
 

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.util.Log;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -31,19 +30,17 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.item.borrowing.admin.Admin_UI;
-import com.item.borrowing.client.Client_UI;
+import com.item.borrowing.client.UI.Client_UI;
 import com.item.borrowing.tools.LoadingDialog;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
@@ -86,8 +83,17 @@ public class SignInInterface extends AppCompatActivity {
         currentUser = userAuth.getCurrentUser();
 
         if(currentUser != null){
-            Intent goAdmin = new Intent(SignInInterface.this, Admin_UI.class);
-            startActivity(goAdmin);
+            for(UserInfo info : currentUser.getProviderData()){
+                Intent goSomewhere;
+                if(info.getProviderId().contains("google")){
+                    goSomewhere = new Intent(SignInInterface.this, Client_UI.class);
+                    startActivity(goSomewhere);
+                }
+                else{
+                    goSomewhere = new Intent(SignInInterface.this, Admin_UI.class);
+                    startActivity(goSomewhere);
+                }
+            }
         }
     }
     @Override

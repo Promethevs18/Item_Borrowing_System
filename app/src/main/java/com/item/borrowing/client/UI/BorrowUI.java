@@ -1,4 +1,4 @@
-package com.item.borrowing.client;
+package com.item.borrowing.client.UI;
 
 import android.os.Bundle;
 

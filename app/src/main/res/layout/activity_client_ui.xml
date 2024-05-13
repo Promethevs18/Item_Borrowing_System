@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/CustomBackground"
-    tools:context=".client.Client_UI">
+    tools:context=".client.UI.Client_UI">
 
     <ScrollView
         android:layout_width="0dp"
@@ -99,7 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:fontFamily="@font/biryani"
-        android:text="Tool/s available to borrow"
+        android:text="Tool(s) available to borrow"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/krizzia"
         app:layout_constraintStart_toStartOf="@+id/textView2"

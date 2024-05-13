@@ -8,6 +8,8 @@
 
         <item name="colorPrimary">@color/generalWhenLight</item>
 
+        <item name="CustomBackground">@color/backgroundWhenLight</item>
+
         <item name="PrimaryBackground">@color/tintWhenDark</item>
 
     </style>
