@@ -93,6 +93,7 @@ public class User_Account_Customization extends AppCompatActivity {
 
             }
         });
+
         save.setOnClickListener(v -> {
             LoadingDialog load = new LoadingDialog(this, "Updating data...");
             load.Show();

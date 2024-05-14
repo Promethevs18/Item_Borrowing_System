@@ -73,11 +73,9 @@ public class Client_UI extends AppCompatActivity {
         RecyclerView.LayoutManager manager = new LinearLayoutManager(Client_UI.this, RecyclerView.VERTICAL, false);
         listahan.setLayoutManager(manager);
 
-
         //Create FirestoreRecyclerOptions
         FirestoreRecyclerOptions<itemsModels> options = new FirestoreRecyclerOptions.Builder<itemsModels>()
                 .setQuery(query,itemsModels.class).build();
-
 
         //call the adapter, then set the RecyclerOptions to the adapter
         adapter = new itemsAdapter(options);
@@ -86,11 +84,9 @@ public class Client_UI extends AppCompatActivity {
         //Don't forget to use start Listening
         adapter.startListening();
 
-
         //for the display of both names and pic
         intro.setText(String.format("Welcome, \n%s!", Objects.requireNonNull(user).getDisplayName()));
         Picasso.get().load(user.getPhotoUrl()).into(Krizzia);
-
 
     }
 
@@ -106,29 +102,6 @@ public class Client_UI extends AppCompatActivity {
         Krizzia.setOnClickListener(v -> {
             Intent goCustom = new Intent(Client_UI.this, User_Account_Customization.class);
             startActivity(goCustom);
-        });
-
-        //for loading logic
-        LoadingDialog load = new LoadingDialog(Client_UI.this, "Fetching data from the database");
-        load.Show();
-        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                load.Close();
-            }
-
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                load.Close();
-            }
-
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                super.onItemRangeRemoved(positionStart, itemCount);
-                load.Close();
-            }
         });
 
     }
