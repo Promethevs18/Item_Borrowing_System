@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
@@ -29,6 +30,11 @@ import com.item.borrowing.R;
 import com.item.borrowing.client.Models.itemsModels;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.StringJoiner;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class BorrowUI extends AppCompatActivity {
@@ -42,6 +48,10 @@ public class BorrowUI extends AppCompatActivity {
     FirebaseUser user;
     CircleImageView profile;
 
+    ArrayList<String> toolsSelected;
+    String toolsBorrowed = " ";
+
+    HashMap<String, String> IICs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,13 +69,16 @@ public class BorrowUI extends AppCompatActivity {
         toolChips = findViewById(R.id.toolChip);
         profile = findViewById(R.id.userImage);
 
+        toolsSelected = new ArrayList<>();
+        IICs = new HashMap<>();
+
         db = FirebaseFirestore.getInstance();
         query = db.collection("Items");
 
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for(DocumentChange doc : value.getDocumentChanges()){
+                for(DocumentChange doc : Objects.requireNonNull(value).getDocumentChanges()){
                     itemsModels item = doc.getDocument().toObject(itemsModels.class);
 
                     //initialize the chip
@@ -87,6 +100,9 @@ public class BorrowUI extends AppCompatActivity {
                     chip.setChipDrawable(drawChip);
                     //give the chips to the chip group
                     toolChips.addView(chip);
+
+                    //add the items to the hashmap
+                    IICs.put(chip.getText().toString(), item.getIic());
                 }
             }
         });
@@ -100,10 +116,37 @@ public class BorrowUI extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-            name.setText(user.getDisplayName());
-            department.setText(user.getEmail());
+        name.setText(user.getDisplayName());
+        department.setText(user.getEmail());
 
         Picasso.get().load(user.getPhotoUrl()).into(profile);
+
+
+
+        //The picker responsible for getting the data from the chips
+        toolChips.setOnCheckedStateChangeListener((group, checkedId) -> {
+            toolsSelected.clear();
+            int count = group.getChildCount();
+            for(int i = 0; i < count; i++){
+                Chip chip = (Chip) group.getChildAt(i);
+                if(chip.isChecked()){
+                    if(!toolsSelected.contains(String.valueOf(chip.getText()))){
+                        toolsSelected.add(IICs.get(chip.getText().toString()));
+                    }
+                    else{
+                        toolsSelected.remove(IICs.get(chip.getText().toString()));
+                    }
+                }
+            }
+            StringJoiner pagsama = new StringJoiner(", ");
+            for (int x = 0; x < toolsSelected.size(); x++) {
+                pagsama.add(toolsSelected.get(x));
+            }
+            toolsBorrowed = pagsama.toString();
+            Toast.makeText(this, toolsBorrowed, Toast.LENGTH_SHORT).show();
+            Log.d("Tools", String.valueOf(toolsSelected));
+        });
+
 
     }
 }
