@@ -24,6 +24,7 @@ import androidx.credentials.PublicKeyCredential;
 import androidx.credentials.exceptions.GetCredentialException;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
@@ -36,11 +37,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.item.borrowing.admin.Admin_UI;
 import com.item.borrowing.client.UI.Client_UI;
 import com.item.borrowing.tools.LoadingDialog;
+import com.item.borrowing.tools.MessageDisplayer;
 
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
@@ -230,9 +234,24 @@ public class SignInInterface extends AppCompatActivity {
             userAuth.signInWithCredential(fireCreds).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                 @Override
                 public void onSuccess(AuthResult authResult) {
-                    load.Close();
-                    Intent goUser = new Intent(SignInInterface.this, Client_UI.class);
-                    startActivity(goUser);
+                    HashMap<String, Object> userInfo = new HashMap<>();
+                    userInfo.put("fullName", authResult.getUser().getDisplayName());
+                    userInfo.put("email", authResult.getUser().getEmail());
+                    userInfo.put("profileImage", authResult.getUser().getPhotoUrl());
+                    userInfo.put("accountLevel", "user");
+                    userInfo.put("status", "Activated");
+
+                    apoy.collection("Users list").document(Objects.requireNonNull(Objects.requireNonNull(authResult.getUser()).getDisplayName())).update(userInfo).addOnSuccessListener(unused -> {
+                        load.Close();
+                        Intent goUser = new Intent(SignInInterface.this, Client_UI.class);
+                        startActivity(goUser);
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            MessageDisplayer message = new MessageDisplayer(SignInInterface.this, "Cannot sign in","I can't sign you in at the moment. Try later",true);
+                        }
+                    });
+
                 }
             });
         }

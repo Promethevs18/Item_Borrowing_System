@@ -2,6 +2,7 @@ package com.item.borrowing.client.UI;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -14,8 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.item.borrowing.R;
@@ -23,6 +27,7 @@ import com.item.borrowing.SignInInterface;
 import com.item.borrowing.client.Adapters.itemsAdapter;
 import com.item.borrowing.client.Models.itemsModels;
 import com.item.borrowing.tools.LoadingDialog;
+import com.item.borrowing.tools.MessageDisplayer;
 import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
@@ -40,7 +45,7 @@ public class Client_UI extends AppCompatActivity {
     Button GoBorrow;
     itemsAdapter adapter;
     FirebaseUser user;
-
+    String userStatus = "";
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,16 +92,32 @@ public class Client_UI extends AppCompatActivity {
         //for the display of both names and pic
         intro.setText(String.format("Welcome, \n%s!", Objects.requireNonNull(user).getDisplayName()));
         Picasso.get().load(user.getPhotoUrl()).into(Krizzia);
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
+
+        DocumentReference reference = FirebaseFirestore.getInstance().collection("Users list").document(user.getDisplayName());
+        reference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                userStatus = documentSnapshot.getString("borrowedStatus");
+            }
+        });
+
+        //Buttons
         GoBorrow.setOnClickListener(v -> {
-            Intent goBorrow = new Intent(Client_UI.this, BorrowUI.class);
-            startActivity(goBorrow);
+
+            if (!userStatus.equals("borrower")) {
+                Intent goBorrow = new Intent(Client_UI.this, BorrowUI.class);
+                startActivity(goBorrow);
+            }
+            else{
+                MessageDisplayer messageDisplayer = new MessageDisplayer(Client_UI.this, "You already borrowed an item", "It would seem that you have a pending document pertaining that you borrowed some items. If you think this is a mistake, contact the Engineering deparment", true);
+                messageDisplayer.show();
+            }
         });
 
         Krizzia.setOnClickListener(v -> {
@@ -104,19 +125,5 @@ public class Client_UI extends AppCompatActivity {
             startActivity(goCustom);
         });
 
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        auth.signOut();
-        adapter.stopListening();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        auth.signOut();
-        adapter.stopListening();
     }
 }

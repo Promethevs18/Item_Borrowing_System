@@ -1,5 +1,6 @@
 package com.item.borrowing.client.UI;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipDrawable;
 import com.google.android.material.chip.ChipGroup;
@@ -27,10 +29,15 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.item.borrowing.R;
+import com.item.borrowing.SignInInterface;
 import com.item.borrowing.client.Models.itemsModels;
+import com.item.borrowing.tools.DateGetter;
+import com.item.borrowing.tools.LoadingDialog;
+import com.item.borrowing.tools.MessageDisplayer;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -52,6 +59,9 @@ public class BorrowUI extends AppCompatActivity {
     String toolsBorrowed = " ";
 
     HashMap<String, String> IICs;
+    DateGetter date;
+    MessageDisplayer displayer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +85,10 @@ public class BorrowUI extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         query = db.collection("Items");
 
+        date = new DateGetter();
+
+
+        //taga kuha ng chips
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -122,7 +136,6 @@ public class BorrowUI extends AppCompatActivity {
         Picasso.get().load(user.getPhotoUrl()).into(profile);
 
 
-
         //The picker responsible for getting the data from the chips
         toolChips.setOnCheckedStateChangeListener((group, checkedId) -> {
             toolsSelected.clear();
@@ -148,5 +161,29 @@ public class BorrowUI extends AppCompatActivity {
         });
 
 
+        //The button responsible for borrowing the items
+        borrow.setOnClickListener(v -> {
+            LoadingDialog load = new LoadingDialog(BorrowUI.this, "Sending Request");
+            load.Show();
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("borrower", user.getDisplayName());
+            data.put("tools", toolsBorrowed);
+            data.put("email", user.getEmail());
+            data.put("date", System.currentTimeMillis());
+
+            db.collection("Requests").document(date.postDate()).collection(Objects.requireNonNull(user.getDisplayName())).add(data).addOnSuccessListener(documentReference -> {
+
+                db.collection("Users list").document(user.getDisplayName()).update("borrowedStatus", "borrower").addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        load.Close();
+                        Intent intent = new Intent(BorrowUI.this, SignInInterface.class);
+                        displayer = new MessageDisplayer(BorrowUI.this, "Request Sent","Request Sent Successfully! Please wait for an email for confirmation. For security purposes, you will be directed to the login page",true,intent);
+                        FirebaseAuth.getInstance().signOut();
+                        displayer.showAndGo();
+                    }
+                });
+            });
+        });
     }
 }

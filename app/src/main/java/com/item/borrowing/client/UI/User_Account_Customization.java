@@ -1,10 +1,12 @@
 package com.item.borrowing.client.UI;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
@@ -19,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.item.borrowing.R;
+import com.item.borrowing.SignInInterface;
 import com.item.borrowing.tools.LoadingDialog;
 import com.squareup.picasso.Picasso;
 
@@ -32,7 +35,7 @@ public class User_Account_Customization extends AppCompatActivity {
     CircleImageView profileImage;
     TextInputLayout name, email, phone, department;
     TextInputEditText user_name, user_email, user_phone, user_department;
-    Button save;
+    Button save, logout;
 
     FirebaseAuth auth;
     FirebaseUser user;
@@ -62,6 +65,7 @@ public class User_Account_Customization extends AppCompatActivity {
         user_department = findViewById(R.id.departmentEditText);
 
         save = findViewById(R.id.updateData);
+        logout = findViewById(R.id.logout);
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
@@ -77,6 +81,7 @@ public class User_Account_Customization extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        //EditText textwatcher
         user_department.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -94,6 +99,7 @@ public class User_Account_Customization extends AppCompatActivity {
             }
         });
 
+        //update data
         save.setOnClickListener(v -> {
             LoadingDialog load = new LoadingDialog(this, "Updating data...");
             load.Show();
@@ -104,7 +110,7 @@ public class User_Account_Customization extends AppCompatActivity {
             detailsMap.put("phone", Objects.requireNonNull(user_phone.getText()).toString());
             detailsMap.put("department", Objects.requireNonNull(user_department.getText()).toString());
 
-            db.collection("Users list").document(user_name.getText().toString()).set(detailsMap).addOnSuccessListener(aVoid -> {
+            db.collection("Users list").document(user_name.getText().toString()).update(detailsMap).addOnSuccessListener(aVoid -> {
                 load.Close();
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Success!");
@@ -115,6 +121,14 @@ public class User_Account_Customization extends AppCompatActivity {
                 save.setVisibility(View.GONE);
 
             });
+        });
+
+        //logout button
+        logout.setOnClickListener(v -> {
+            auth.signOut();
+            finish();
+            Toast.makeText(getApplicationContext(), "You have successfully logged out!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(User_Account_Customization.this, SignInInterface.class));
         });
     }
 }
