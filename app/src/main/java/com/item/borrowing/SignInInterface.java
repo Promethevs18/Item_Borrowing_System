@@ -86,19 +86,6 @@ public class SignInInterface extends AppCompatActivity {
         //getting the current user from Firebase
         currentUser = userAuth.getCurrentUser();
 
-        if(currentUser != null){
-            for(UserInfo info : currentUser.getProviderData()){
-                Intent goSomewhere;
-                if(info.getProviderId().contains("google")){
-                    goSomewhere = new Intent(SignInInterface.this, Client_UI.class);
-                    startActivity(goSomewhere);
-                }
-                else{
-                    goSomewhere = new Intent(SignInInterface.this, Admin_UI.class);
-                    startActivity(goSomewhere);
-                }
-            }
-        }
     }
     @Override
     protected void onStart() {
@@ -240,8 +227,9 @@ public class SignInInterface extends AppCompatActivity {
                     userInfo.put("profileImage", authResult.getUser().getPhotoUrl());
                     userInfo.put("accountLevel", "user");
                     userInfo.put("status", "Activated");
+                    userInfo.put("borrowedStatus", "No");
 
-                    apoy.collection("Users list").document(Objects.requireNonNull(Objects.requireNonNull(authResult.getUser()).getDisplayName())).update(userInfo).addOnSuccessListener(unused -> {
+                    apoy.collection("Users list").document(Objects.requireNonNull(Objects.requireNonNull(authResult.getUser()).getDisplayName())).set(userInfo).addOnSuccessListener(unused -> {
                         load.Close();
                         Intent goUser = new Intent(SignInInterface.this, Client_UI.class);
                         startActivity(goUser);

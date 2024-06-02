@@ -6,12 +6,22 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ItemBorrowingSystem"
         tools:targetApi="31">
+        <activity
+            android:name=".admin.AdminSchedule"
+            android:exported="false" />
+        <activity
+            android:name=".tools.Capture"
+            android:exported="false" />
+        <activity
+            android:name=".admin.AdminItem"
+            android:exported="false" />
         <activity
             android:name=".client.UI.User_Account_Customization"
             android:exported="false" />

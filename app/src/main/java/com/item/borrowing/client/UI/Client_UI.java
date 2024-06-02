@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -15,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -45,7 +48,7 @@ public class Client_UI extends AppCompatActivity {
     Button GoBorrow;
     itemsAdapter adapter;
     FirebaseUser user;
-    String userStatus = "";
+    String userStatus;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +95,6 @@ public class Client_UI extends AppCompatActivity {
         //for the display of both names and pic
         intro.setText(String.format("Welcome, \n%s!", Objects.requireNonNull(user).getDisplayName()));
         Picasso.get().load(user.getPhotoUrl()).into(Krizzia);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
 
         DocumentReference reference = FirebaseFirestore.getInstance().collection("Users list").document(user.getDisplayName());
         reference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -105,18 +102,37 @@ public class Client_UI extends AppCompatActivity {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 userStatus = documentSnapshot.getString("borrowedStatus");
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                userStatus = "";
+                Toast.makeText(Client_UI.this, "Nothing is found", Toast.LENGTH_SHORT).show();
+            }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
+
 
         //Buttons
         GoBorrow.setOnClickListener(v -> {
-
-            if (!userStatus.equals("borrower")) {
-                Intent goBorrow = new Intent(Client_UI.this, BorrowUI.class);
-                startActivity(goBorrow);
+              if(userStatus != null) {
+                if (!userStatus.equals("borrower")) {
+                    Intent goBorrow = new Intent(Client_UI.this, BorrowUI.class);
+                    startActivity(goBorrow);
+               }
+                else{
+                    MessageDisplayer messageDisplayer = new MessageDisplayer(Client_UI.this, "You already borrowed an item", "It would seem that you have a pending document pertaining that you borrowed some items. If you think this is a mistake, contact the Engineering deparment", true);
+                    messageDisplayer.show();
+                }
             }
             else{
-                MessageDisplayer messageDisplayer = new MessageDisplayer(Client_UI.this, "You already borrowed an item", "It would seem that you have a pending document pertaining that you borrowed some items. If you think this is a mistake, contact the Engineering deparment", true);
-                messageDisplayer.show();
+                MessageDisplayer showMessage = new MessageDisplayer(Client_UI.this, "Complete Profile First", "Please complete your profile information first by clicking on your image on the top-right pane of the screen, before you can borrow",true);
+                showMessage.show();
             }
         });
 
@@ -124,6 +140,17 @@ public class Client_UI extends AppCompatActivity {
             Intent goCustom = new Intent(Client_UI.this, User_Account_Customization.class);
             startActivity(goCustom);
         });
-
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+        auth.signOut();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        adapter.stopListening();
+        auth.signOut();
     }
 }

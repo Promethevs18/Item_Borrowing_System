@@ -169,9 +169,10 @@ public class BorrowUI extends AppCompatActivity {
             data.put("borrower", user.getDisplayName());
             data.put("tools", toolsBorrowed);
             data.put("email", user.getEmail());
-            data.put("date", System.currentTimeMillis());
+            data.put("date", date.postDate());
+            data.put("profileImage", user.getPhotoUrl());
 
-            db.collection("Requests").document(date.postDate()).collection(Objects.requireNonNull(user.getDisplayName())).add(data).addOnSuccessListener(documentReference -> {
+            db.collection("Requests").document(user.getDisplayName()).set(data).addOnSuccessListener(documentReference -> {
 
                 db.collection("Users list").document(user.getDisplayName()).update("borrowedStatus", "borrower").addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
