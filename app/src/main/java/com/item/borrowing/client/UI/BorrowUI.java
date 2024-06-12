@@ -180,50 +180,66 @@ public class BorrowUI extends AppCompatActivity {
             load.Show();
             HashMap<String, Object> data = new HashMap<>();
             data.put("borrower", user.getDisplayName());
-            data.put("tools", toolsName);
             data.put("email", user.getEmail());
             data.put("date", date.postDate());
             data.put("profileImage", user.getPhotoUrl());
-
             HashMap<String, Object> data2 = new HashMap<>();
-            data2.put("ItemExistence", "borrowed");
+            data2.put("ItemExistence", "Borrowed");
 
-            Task<DocumentSnapshot> snap = FirebaseFirestore.getInstance().collection("Counters").document("transactionCounter").get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            Task<DocumentSnapshot> snap = FirebaseFirestore.getInstance().collection("Counters").document("transactionCounter").get();
+            snap.addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    String value = documentSnapshot.get("value").toString();
-                    data.put("transactionCode", value);
-                    db.collection("Requests").add(data).addOnSuccessListener(documentReference -> {
+                    int valueNum = Integer.parseInt(String.valueOf(documentSnapshot.get("value")));
+                    String transactionCode = "2024-" + padWithZeros(valueNum, 5);
+                    data.put("transactionCode", transactionCode);
 
+                    String[] itemNames = toolsBorrowed.split(",");
+                    String[] itemPangalan = toolsName.split(",");
+
+                    for(int i = 0; i < itemNames.length; i++){
+                        itemNames[i] = itemNames[i].trim();
+                    }
+                    for(int i = 0; i < itemPangalan.length; i++){
+                        itemPangalan[i] = itemPangalan[i].trim();
+                    }
+
+                    for (int i = 0; i < itemNames.length; i++) {
+                        String items = itemNames[i];
+                        String itemPangalanName = itemPangalan[i];
+                        data.put("tools", itemPangalanName);
+                    db.collection("Requests").add(data).addOnSuccessListener(documentReference -> {
                         db.collection("Users list").document(Objects.requireNonNull(user.getDisplayName())).update("borrowedStatus", "borrower").addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-
-                                String[] itemNames = toolsBorrowed.split(",");
-
-                                for(int i = 0; i < itemNames.length; i++){
-                                    itemNames[i] = itemNames[i].trim();
-                                }
-                                for(String items: itemNames){
                                     db.collection("Items").document(items).set(data2, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
-                                            load.Close();
-                                            Intent intent = new Intent(BorrowUI.this, SignInInterface.class);
-                                            displayer = new MessageDisplayer(BorrowUI.this, "Request Sent","Request Sent Successfully! Please wait for an email for confirmation. For security purposes, you will be directed to the login page",true,intent);
-                                            FirebaseAuth.getInstance().signOut();
-                                            displayer.showAndGo();
+                                            db.collection("Counters").document("transactionCounter").update("value", valueNum+itemNames.length).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    load.Close();
+                                                    Intent intent = new Intent(BorrowUI.this, SignInInterface.class);
+                                                    displayer = new MessageDisplayer(BorrowUI.this, "Request Sent","Request Sent Successfully! Please wait for an email for confirmation. For security purposes, you will be directed to the login page",true,intent);
+                                                    FirebaseAuth.getInstance().signOut();
+                                                    displayer.showAndGo();
+                                                }
+                                            });
                                         }
                                     });
                                 }
-                            }
                         });
                     });
+                        }
                 }
             });
-
-
         });
     }
-
+    public String padWithZeros(int number, int length) {
+        String resulta = String.valueOf(number);
+        while (resulta.length() < length) {
+            resulta = "0" + resulta;
+        }
+        return resulta;
+    }
 }

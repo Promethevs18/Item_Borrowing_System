@@ -55,7 +55,7 @@ public class AdminSchedule extends AppCompatActivity {
         tools = findViewById(R.id.iicNum);
         image = findViewById(R.id.borrowerImage);
 
-        collectionReference = FirebaseFirestore.getInstance().collection("Requests");
+        collectionReference = FirebaseFirestore.getInstance().collection("Approved Requests");
         try{
             collectionReference.document(dataTaken).get().addOnSuccessListener(v -> {
                 if (v.exists()) {
@@ -66,7 +66,7 @@ public class AdminSchedule extends AppCompatActivity {
                     Picasso.get().load(v.getString("profileImage")).into(image);
                 }
                 else{
-                    MessageDisplayer show = new MessageDisplayer(AdminSchedule.this, "Data not found", "No corresponding entry was found in the database", true);
+                    MessageDisplayer show = new MessageDisplayer(AdminSchedule.this, "Data not found", "Error fetching record", true);
                     show.show();
                 }
             }).addOnFailureListener(new OnFailureListener() {
