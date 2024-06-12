@@ -60,6 +60,8 @@ public class Admin_UI extends AppCompatActivity {
         });
         logout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
+            Intent goHome = new Intent(Admin_UI.this, SignInInterface.class);
+            startActivity(goHome);
         });
     }
     public void Scanner(){

@@ -50,7 +50,13 @@ public class itemsAdapter extends FirestoreRecyclerAdapter<itemsModels, itemsAda
             genDesc.setText(itemsModels.getGenSpecs());
             brandModel.setText(itemsModels.getBrandModel());
 
-            Picasso.get().load(itemsModels.getItemImage()).into(itemImage);
+            if(itemsModels.getItemImage() == null){
+                Picasso.get().load(R.drawable.google_logo).into(itemImage);
+            }
+            else{
+                Picasso.get().load(itemsModels.getItemImage()).into(itemImage);
+            }
+
         }
     }
 }

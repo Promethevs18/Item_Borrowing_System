@@ -152,6 +152,7 @@ public class SignInInterface extends AppCompatActivity {
                         else{
                             forEmail.setError("Credentials do not match");
                             forPass.setError("Credentials do not match");
+                            load.Close();
                         }
                     }
                 });
@@ -188,6 +189,7 @@ public class SignInInterface extends AppCompatActivity {
                         @Override
                         public void run() {
                             Toast.makeText(SignInInterface.this, String.format("An error occurred due to: \n{0}", e.getMessage()), Toast.LENGTH_SHORT).show();
+                            load.Close();
                         }
                     });
                 }
@@ -198,6 +200,7 @@ public class SignInInterface extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(SignInInterface.this, "Invalid Google credential detected", Toast.LENGTH_SHORT).show();
+                        load.Close();
                     }
                 });
             }
@@ -207,6 +210,7 @@ public class SignInInterface extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    load.Close();
                     Toast.makeText(SignInInterface.this, "Invalid credential provider was detected", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -237,6 +241,7 @@ public class SignInInterface extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             MessageDisplayer message = new MessageDisplayer(SignInInterface.this, "Cannot sign in","I can't sign you in at the moment. Try later",true);
+                            load.Close();
                         }
                     });
 
@@ -245,6 +250,7 @@ public class SignInInterface extends AppCompatActivity {
         }
         else {
             Toast.makeText(this, "Something went wrong with requesting the Sign in to Firebase", Toast.LENGTH_SHORT).show();
+            load.Close();
         }
     }
 

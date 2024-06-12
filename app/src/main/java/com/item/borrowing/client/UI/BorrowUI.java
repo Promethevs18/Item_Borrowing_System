@@ -17,17 +17,21 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipDrawable;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.item.borrowing.R;
 import com.item.borrowing.SignInInterface;
 import com.item.borrowing.client.Models.itemsModels;
@@ -56,7 +60,9 @@ public class BorrowUI extends AppCompatActivity {
     CircleImageView profile;
 
     ArrayList<String> toolsSelected;
+    ArrayList<String> toolsRealName;
     String toolsBorrowed = " ";
+    String toolsName = "";
 
     HashMap<String, String> IICs;
     DateGetter date;
@@ -80,6 +86,8 @@ public class BorrowUI extends AppCompatActivity {
         profile = findViewById(R.id.userImage);
 
         toolsSelected = new ArrayList<>();
+        toolsRealName = new ArrayList<>();
+
         IICs = new HashMap<>();
 
         db = FirebaseFirestore.getInstance();
@@ -89,11 +97,12 @@ public class BorrowUI extends AppCompatActivity {
 
 
         //taga kuha ng chips
-        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        query.whereNotEqualTo("ItemExistence", "borrowed").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 for(DocumentChange doc : Objects.requireNonNull(value).getDocumentChanges()){
                     itemsModels item = doc.getDocument().toObject(itemsModels.class);
+
 
                     //initialize the chip
                     Chip chip = new Chip(BorrowUI.this);
@@ -139,25 +148,29 @@ public class BorrowUI extends AppCompatActivity {
         //The picker responsible for getting the data from the chips
         toolChips.setOnCheckedStateChangeListener((group, checkedId) -> {
             toolsSelected.clear();
+            toolsRealName.clear();
             int count = group.getChildCount();
             for(int i = 0; i < count; i++){
                 Chip chip = (Chip) group.getChildAt(i);
                 if(chip.isChecked()){
                     if(!toolsSelected.contains(String.valueOf(chip.getText()))){
                         toolsSelected.add(IICs.get(chip.getText().toString()));
+                        toolsRealName.add(String.valueOf(chip.getText()));
                     }
                     else{
                         toolsSelected.remove(IICs.get(chip.getText().toString()));
+                        toolsRealName.remove(String.valueOf(chip.getText()));
                     }
                 }
             }
             StringJoiner pagsama = new StringJoiner(", ");
+            StringJoiner names = new StringJoiner(", ");
             for (int x = 0; x < toolsSelected.size(); x++) {
                 pagsama.add(toolsSelected.get(x));
+                names.add(toolsRealName.get(x));
             }
             toolsBorrowed = pagsama.toString();
-            Toast.makeText(this, toolsBorrowed, Toast.LENGTH_SHORT).show();
-            Log.d("Tools", String.valueOf(toolsSelected));
+            toolsName = names.toString();
         });
 
 
@@ -167,24 +180,50 @@ public class BorrowUI extends AppCompatActivity {
             load.Show();
             HashMap<String, Object> data = new HashMap<>();
             data.put("borrower", user.getDisplayName());
-            data.put("tools", toolsBorrowed);
+            data.put("tools", toolsName);
             data.put("email", user.getEmail());
             data.put("date", date.postDate());
             data.put("profileImage", user.getPhotoUrl());
 
-            db.collection("Requests").document(user.getDisplayName()).set(data).addOnSuccessListener(documentReference -> {
+            HashMap<String, Object> data2 = new HashMap<>();
+            data2.put("ItemExistence", "borrowed");
 
-                db.collection("Users list").document(user.getDisplayName()).update("borrowedStatus", "borrower").addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        load.Close();
-                        Intent intent = new Intent(BorrowUI.this, SignInInterface.class);
-                        displayer = new MessageDisplayer(BorrowUI.this, "Request Sent","Request Sent Successfully! Please wait for an email for confirmation. For security purposes, you will be directed to the login page",true,intent);
-                        FirebaseAuth.getInstance().signOut();
-                        displayer.showAndGo();
-                    }
-                });
+            Task<DocumentSnapshot> snap = FirebaseFirestore.getInstance().collection("Counters").document("transactionCounter").get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    String value = documentSnapshot.get("value").toString();
+                    data.put("transactionCode", value);
+                    db.collection("Requests").add(data).addOnSuccessListener(documentReference -> {
+
+                        db.collection("Users list").document(Objects.requireNonNull(user.getDisplayName())).update("borrowedStatus", "borrower").addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+
+                                String[] itemNames = toolsBorrowed.split(",");
+
+                                for(int i = 0; i < itemNames.length; i++){
+                                    itemNames[i] = itemNames[i].trim();
+                                }
+                                for(String items: itemNames){
+                                    db.collection("Items").document(items).set(data2, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            load.Close();
+                                            Intent intent = new Intent(BorrowUI.this, SignInInterface.class);
+                                            displayer = new MessageDisplayer(BorrowUI.this, "Request Sent","Request Sent Successfully! Please wait for an email for confirmation. For security purposes, you will be directed to the login page",true,intent);
+                                            FirebaseAuth.getInstance().signOut();
+                                            displayer.showAndGo();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    });
+                }
             });
+
+
         });
     }
+
 }
