@@ -52,21 +52,16 @@
             android:text="This is a sample text" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/departmentLayout"
+    <Spinner
+        android:id="@+id/departmentSpinner"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginTop="12dp"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toBottomOf="@+id/emailLayout">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/departmentEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Write department" />
-    </com.google.android.material.textfield.TextInputLayout>
+    </Spinner>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/phoneLayout"
@@ -75,7 +70,7 @@
         android:layout_marginTop="12dp"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
-        app:layout_constraintTop_toBottomOf="@+id/departmentLayout">
+        app:layout_constraintTop_toBottomOf="@+id/departmentSpinner">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/phoneEditText"

@@ -115,9 +115,6 @@ public class Client_UI extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-
-
-
         //Buttons
         GoBorrow.setOnClickListener(v -> {
               if(userStatus != null) {
@@ -140,17 +137,5 @@ public class Client_UI extends AppCompatActivity {
             Intent goCustom = new Intent(Client_UI.this, User_Account_Customization.class);
             startActivity(goCustom);
         });
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        adapter.stopListening();
-        auth.signOut();
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        adapter.stopListening();
-        auth.signOut();
     }
 }

@@ -127,6 +127,7 @@ public class SignInInterface extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         Toast.makeText(SignInInterface.this, String.format("An error occurred due to: \n{0}", e.getMessage()), Toast.LENGTH_SHORT).show();
+                                    load.Close();
                                     }
                                 });
                             }
@@ -147,7 +148,14 @@ public class SignInInterface extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Intent goAdmin = new Intent(SignInInterface.this, Admin_UI.class);
+                            if(email.getText().toString().contains("admin")){
+                                goAdmin.putExtra("admin", "admin");
+                            }
+                            else {
+                                goAdmin.putExtra("admin", "user");
+                            }
                             startActivity(goAdmin);
+                            load.Close();
                         }
                         else{
                             forEmail.setError("Credentials do not match");

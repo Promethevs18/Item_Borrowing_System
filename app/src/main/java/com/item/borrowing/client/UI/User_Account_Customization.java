@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -33,13 +36,17 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class User_Account_Customization extends AppCompatActivity {
 
     CircleImageView profileImage;
-    TextInputLayout name, email, phone, department;
+    TextInputLayout name, email, phone;
+    Spinner department;
     TextInputEditText user_name, user_email, user_phone, user_department;
     Button save, logout;
 
     FirebaseAuth auth;
     FirebaseUser user;
     FirebaseFirestore db;
+    String chosenDep = "";
+
+    String[] items = {"College Of Engineering", "Others"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,12 +64,11 @@ public class User_Account_Customization extends AppCompatActivity {
         name = findViewById(R.id.nameLayout);
         email = findViewById(R.id.emailLayout);
         phone = findViewById(R.id.phoneLayout);
-        department = findViewById(R.id.departmentLayout);
+        department = findViewById(R.id.departmentSpinner);
 
         user_name = findViewById(R.id.nameEditText);
         user_email = findViewById(R.id.emailEditText);
         user_phone = findViewById(R.id.phoneEditText);
-        user_department = findViewById(R.id.departmentEditText);
 
         save = findViewById(R.id.updateData);
         logout = findViewById(R.id.logout);
@@ -81,6 +87,22 @@ public class User_Account_Customization extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        department.setAdapter(adapter);
+
+        department.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = items[position];
+                chosenDep = selectedItem;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle case when nothing is selected
+            }
+        });
         //EditText textwatcher
         user_department.addTextChangedListener(new TextWatcher() {
             @Override
@@ -108,7 +130,7 @@ public class User_Account_Customization extends AppCompatActivity {
             detailsMap.put("name", Objects.requireNonNull(user_name.getText()).toString());
             detailsMap.put("email", Objects.requireNonNull(user_email.getText()).toString());
             detailsMap.put("phone", Objects.requireNonNull(user_phone.getText()).toString());
-            detailsMap.put("department", Objects.requireNonNull(user_department.getText()).toString());
+            detailsMap.put("department",chosenDep);
 
             db.collection("Users list").document(user_name.getText().toString()).update(detailsMap).addOnSuccessListener(aVoid -> {
                 load.Close();
